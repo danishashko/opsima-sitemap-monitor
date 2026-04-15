@@ -1,0 +1,40 @@
+name: Sitemap Monitor — Opsima Blog
+
+on:
+  schedule:
+    # 8PM UTC = 10PM Israel Standard Time (UTC+2 in winter, UTC+3 in summer = 11PM IDT)
+    - cron: '0 20 * * *'
+  workflow_dispatch: # Allow manual trigger for testing / bootstrapping
+
+jobs:
+  check-sitemap:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed to commit known-urls.json back
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: scripts/package.json
+
+      - name: Install dependencies
+        run: npm install --prefix scripts
+
+      - name: Run sitemap check
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        run: node scripts/check-sitemap.js
+
+      - name: Commit updated known URLs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/known-urls.json
+          git diff --staged --quiet && echo "No changes to commit." || \
+            git commit -m "chore: update known sitemap URLs [skip ci]" && git push
