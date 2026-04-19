@@ -1,11 +1,12 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { XMLParser } from 'fast-xml-parser';
 import sgMail from '@sendgrid/mail';
 
 const SITEMAP_URL = 'https://opsima.com/blog/wp-sitemap-posts-post-1.xml';
-const KNOWN_URLS_FILE = new URL('./known-urls.json', import.meta.url).pathname;
+const KNOWN_URLS_FILE = fileURLToPath(new URL('./known-urls.json', import.meta.url));
 const FROM_EMAIL = 'daniel.shashko@gmail.com';
-const TO_EMAIL = 'alon@simaanalytics.com';
+const TO_EMAIL = 'blog@simaanalytics.com';
 
 async function fetchSitemap(url) {
   const res = await fetch(url);
