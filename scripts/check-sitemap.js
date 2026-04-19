@@ -122,8 +122,7 @@ async function sendEmail(newPosts) {
     from: FROM_EMAIL,
     subject: `📝 ${count} New Post${count !== 1 ? 's' : ''} Published on Opsima Blog`,
     html: buildEmailHtml(newPosts),
-    text: buildEmailText(newPosts),
-    trackingSettings: {
+    trackingSettings:{
       clickTracking: { enable: false, enableText: false },
     },
   });
