@@ -95,6 +95,22 @@ function buildEmailHtml(newPosts) {
 </html>`;
 }
 
+function buildEmailText(newPosts) {
+  const lines = [
+    `📝 ${newPosts.length} New Post${newPosts.length !== 1 ? 's' : ''} on the Opsima Blog`,
+    `The following article${newPosts.length !== 1 ? 's were' : ' was'} published since the last check:`,
+    '',
+  ];
+  for (const post of newPosts) {
+    lines.push(`• ${post.title}`);
+    lines.push(`  ${post.description}`);
+    lines.push(`  ${post.url}`);
+    lines.push('');
+  }
+  lines.push('View all posts: https://opsima.com/blog');
+  return lines.join('\n');
+}
+
 async function sendEmail(newPosts) {
   const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) throw new Error('SENDGRID_API_KEY env var is not set.');
@@ -106,6 +122,7 @@ async function sendEmail(newPosts) {
     from: FROM_EMAIL,
     subject: `📝 ${count} New Post${count !== 1 ? 's' : ''} Published on Opsima Blog`,
     html: buildEmailHtml(newPosts),
+    text: buildEmailText(newPosts),
   });
 
   console.log(`✅ Email sent to ${TO_EMAIL} for ${count} new post(s).`);
