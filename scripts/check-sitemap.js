@@ -96,18 +96,18 @@ function buildEmailHtml(newPosts) {
 }
 
 function buildEmailText(newPosts) {
-  const lines = [
-    `📝 ${newPosts.length} New Post${newPosts.length !== 1 ? 's' : ''} on the Opsima Blog`,
-    `The following article${newPosts.length !== 1 ? 's were' : ' was'} published since the last check:`,
-    '',
-  ];
+  // Title on line 1, clean URL on line 2 — Google Chat auto-links bare URLs on their own line
+  const lines = [];
   for (const post of newPosts) {
-    lines.push(`• ${post.title}`);
-    lines.push(`  ${post.description}`);
-    lines.push(`  ${post.url}`);
+    lines.push(post.title);
+    lines.push(post.url);
+    lines.push('');
+    lines.push(post.description);
     lines.push('');
   }
-  lines.push('View all posts: https://opsima.com/blog');
+  if (newPosts.length > 1) {
+    lines.push('All posts: https://opsima.com/blog');
+  }
   return lines.join('\n');
 }
 
@@ -122,6 +122,7 @@ async function sendEmail(newPosts) {
     from: FROM_EMAIL,
     subject: `📝 ${count} New Post${count !== 1 ? 's' : ''} Published on Opsima Blog`,
     html: buildEmailHtml(newPosts),
+    text: buildEmailText(newPosts),
     trackingSettings:{
       clickTracking: { enable: false, enableText: false },
     },
