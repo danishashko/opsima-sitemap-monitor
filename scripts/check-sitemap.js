@@ -131,9 +131,15 @@ async function sendEmail(newPosts) {
   console.log(`✅ Email sent to ${TO_EMAIL} for ${count} new post(s).`);
 }
 
+function isEnglishPost(url) {
+  // Translated posts have a 2-letter lang code immediately after /blog/
+  // e.g. /blog/de/, /blog/es/, /blog/fr/ — English goes straight to category
+  return !/\/blog\/[a-z]{2}\//.test(url);
+}
+
 async function main() {
   console.log(`🔍 Fetching sitemap: ${SITEMAP_URL}`);
-  const currentUrls = await fetchSitemap(SITEMAP_URL);
+  const currentUrls = (await fetchSitemap(SITEMAP_URL)).filter(isEnglishPost);
   console.log(`   Found ${currentUrls.length} URL(s) in sitemap.`);
 
   const knownUrls = loadKnownUrls();
